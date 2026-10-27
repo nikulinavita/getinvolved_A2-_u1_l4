@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review time: say it like a creator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EFE7FF;
+  --card: #FFFFFF;
+  --ink: #2A1450;
+  --muted: #6B5A8E;
+  --edge: #2A1450;
+  --shadow: #2A1450;
+  --pink: #FF4F9A;
+  --yellow: #FFD93D;
+  --mint: #5FD9B5;
+  --line: #D9CBF5;
+  --bubble: #FFE9F3;
+  --wrong: #FF8FA3;
+  --on-color: #2A1450;
+  --font-display: "Bagel Fat One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1E1233; --card: #2B1B4A; --ink: #F6EEFF; --muted: #BBA8DD; --edge: #C9B2FF;
+    --shadow: #0E0720; --pink: #FF6FAE; --line: #45306E; --bubble: #4A2150; --wrong: #FF8FA3;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1E1233; --card: #2B1B4A; --ink: #F6EEFF; --muted: #BBA8DD; --edge: #C9B2FF;
+  --shadow: #0E0720; --pink: #FF6FAE; --line: #45306E; --bubble: #4A2150; --wrong: #FF8FA3;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 18px; line-height: 1.45; }
+.app { max-width: 560px; margin: 0 auto; padding: 18px 16px 40px; }
+:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: 34px; line-height: 1.05; margin: 0; }
+.sub { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+.score-box { text-align: right; flex-shrink: 0; }
+.hearts {
+  display: inline-block; background: var(--yellow); color: var(--on-color);
+  border: 3px solid var(--edge); border-radius: 999px; padding: 4px 14px; font-weight: 800; font-size: 20px;
+}
+.hearts.bump { animation: bump .35s ease; }
+@keyframes bump { 40% { transform: scale(1.18) rotate(-3deg); } }
+.level { margin: 4px 0 0; font-size: 14px; color: var(--muted); font-weight: 600; }
+
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+.tab {
+  font: inherit; font-weight: 800; font-size: 16px; cursor: pointer;
+  border: 3px solid var(--edge); border-radius: 999px; padding: 10px 6px;
+  background: var(--card); color: var(--ink);
+}
+.tab[aria-pressed="true"] { background: var(--pink); color: var(--on-color); }
+
+.card {
+  background: var(--card); border: 3px solid var(--edge); border-radius: 28px;
+  box-shadow: 6px 6px 0 var(--shadow); padding: 20px; margin-top: 20px;
+}
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.rec { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--muted); }
+.rec i { width: 11px; height: 11px; border-radius: 50%; background: var(--pink); display: inline-block; }
+
+.topic { display: flex; align-items: center; gap: 14px; margin: 18px 0 6px; }
+.emoji { font-size: 60px; line-height: 1; }
+.topic-label { display: block; font-size: 14px; color: var(--muted); font-weight: 600; }
+.topic-name { font-family: var(--font-display); font-size: 30px; line-height: 1.1; }
+.phrase { font-family: var(--font-display); font-size: 32px; line-height: 1.25; margin: 10px 0 14px; }
+
+.bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; margin-bottom: 16px; }
+.bar > div { height: 100%; width: 100%; background: var(--pink); }
+
+.comment { display: flex; gap: 10px; align-items: flex-start; }
+.avatar {
+  flex: 0 0 42px; height: 42px; border-radius: 50%; background: var(--mint); color: var(--on-color);
+  border: 2px solid var(--edge); display: grid; place-items: center; font-size: 22px;
+}
+.bubble { background: var(--bubble); border: 2px solid var(--edge); border-radius: 18px 18px 18px 4px; padding: 8px 14px 10px; }
+.who { display: block; font-size: 13px; font-weight: 800; color: var(--muted); }
+.bubble p { margin: 0; }
+.task { margin: 12px 0 0; color: var(--muted); font-size: 16px; }
+
+.btn {
+  font: inherit; font-weight: 800; font-size: 17px; cursor: pointer;
+  border: 3px solid var(--edge); border-radius: 999px; padding: 12px 18px;
+  background: var(--card); color: var(--ink); box-shadow: 0 4px 0 var(--shadow);
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--shadow); }
+.btn.primary { background: var(--pink); color: var(--on-color); }
+.btn.mint { background: var(--mint); color: var(--on-color); }
+.btn.small { font-size: 14px; padding: 6px 12px; box-shadow: none; }
+.btn.small:active { transform: none; }
+.btn[disabled] { opacity: .5; cursor: default; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.actions .skip {
+  grid-column: 1 / -1; border-color: transparent; background: transparent; box-shadow: none;
+  color: var(--muted); font-weight: 600; text-decoration: underline;
+}
+.full { grid-column: 1 / -1; }
+
+.bank { margin-top: 24px; }
+.bank > p { margin: 0 0 8px; font-size: 15px; color: var(--muted); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: inherit; border: 2px solid var(--edge); border-radius: 999px; padding: 4px 14px;
+  font-weight: 800; font-size: 16px; background: var(--card); color: var(--ink);
+}
+button.chip { cursor: pointer; }
+button.chip:hover { background: var(--yellow); color: var(--on-color); }
+button.chip[disabled] { opacity: .35; cursor: default; background: var(--card); color: var(--ink); }
+.because { margin-top: 14px; }
+.because[aria-pressed="true"] { background: var(--yellow); color: var(--on-color); }
+.feedback { min-height: 3.2em; margin: 12px 0 4px; font-weight: 600; }
+
+.progress { margin: 0; font-size: 15px; color: var(--muted); font-weight: 600; }
+.stem { font-family: var(--font-display); font-size: 30px; line-height: 1.35; margin: 12px 0 18px; }
+.gap { display: inline-block; min-width: 2.4em; text-align: center; border-bottom: 4px dashed var(--pink); padding: 0 .15em; }
+.gap.filled { border-bottom-style: solid; border-color: var(--mint); }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.opt { text-align: center; }
+.opt.right { background: var(--mint); color: var(--on-color); }
+.opt.wrong { background: var(--wrong); color: var(--on-color); }
+.opt[disabled] { cursor: default; opacity: 1; }
+.end-score { font-family: var(--font-display); font-size: 48px; line-height: 1.1; margin: 10px 0; }
+
+.persona-head { display: flex; align-items: center; gap: 14px; margin: 16px 0 4px; }
+.persona-name { display: block; font-family: var(--font-display); font-size: 30px; line-height: 1.1; }
+.persona-job { display: block; font-size: 15px; color: var(--muted); font-weight: 600; }
+.traits { list-style: none; margin: 16px 0; padding: 0; display: grid; gap: 10px; }
+.trait {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; cursor: pointer;
+  background: var(--card); color: var(--ink); border: 3px solid var(--edge); border-radius: 18px; padding: 10px 12px;
+}
+.trait.done { background: var(--mint); color: var(--on-color); }
+.trait-icon { flex: 0 0 34px; font-size: 26px; text-align: center; }
+.trait-line { display: block; font-weight: 800; font-size: 19px; line-height: 1.3; }
+.trait-sub { display: block; font-size: 15px; color: var(--muted); font-weight: 600; }
+.trait.done .trait-sub { color: var(--on-color); }
+.pick-panel { margin: 8px 0 0; padding: 12px; border: 2px dashed var(--edge); border-radius: 16px; }
+.pick-panel > p { margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--muted); }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--yellow); color: var(--on-color); border: 3px solid var(--edge); border-radius: 999px;
+  padding: 10px 20px; font-weight: 800; box-shadow: 0 4px 0 var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.toast.show { opacity: 1; }
+
+@media (max-width: 420px) {
+  h1 { font-size: 28px; }
+  .phrase { font-size: 27px; }
+  .stem { font-size: 26px; }
+  .topic-name { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Review time</h1>
+      <p class="sub">Choose the phrase yourself. Collect hearts.</p>
+    </div>
+    <div class="score-box">
+      <span class="hearts" id="hearts" aria-label="Hearts">❤️ 0</span>
+      <p class="level" id="level">New creator</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="group" aria-label="Game mode">
+    <button class="tab" id="tabCheck" aria-pressed="false">Check it</button>
+    <button class="tab" id="tabSay" aria-pressed="false">Say it</button>
+    <button class="tab" id="tabPersona" aria-pressed="true">Be someone</button>
+  </div>
+
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  var $ = function (s) { return document.querySelector(s); };
+
+  /* ---------- data ---------- */
+  var PHRASES = ["keen on", "into", "a big fan of", "mad about", "good at", "interested in"];
+
+  /* what the speaker feels, and which phrases fit that feeling */
+  var KINDS = {
+    love:    { emoji: "😍", label: "You love it.",                short: "loves",
+               ok: ["mad about", "a big fan of", "into", "keen on"],
+               hint: "Use a phrase for things you really like." },
+    skill:   { emoji: "💪", label: "You’re good at it.",          short: "good at",
+               ok: ["good at"],
+               hint: "We use one special phrase for things you can do well." },
+    curious: { emoji: "🤔", label: "You want to learn about it.", short: "wants to learn",
+               ok: ["interested in", "keen on"],
+               hint: "Use a phrase for things you want to learn about." },
+    dislike: { emoji: "🙅‍♀️", label: "You don’t like it.",        short: "doesn’t like",
+               ok: ["keen on", "into", "a big fan of", "mad about", "interested in"],
+               hint: "Say it with not. Which phrase fits?" }
+  };
+
+  var TOPICS = [
+    { e: "☕", t: "iced latte", ing: false },
+    { e: "🌸", t: "perfume", ing: false },
+    { e: "👟", t: "sneakers", ing: false },
+    { e: "🎶", t: "K-pop", ing: false },
+    { e: "👻", t: "horror films", ing: false },
+    { e: "📚", t: "comics", ing: false },
+    { e: "📱", t: "social media", ing: false },
+    { e: "⚽", t: "football", ing: false },
+    { e: "🍵", t: "matcha", ing: false },
+    { e: "💄", t: "makeup", ing: false },
+    { e: "🧴", t: "skincare", ing: false },
+    { e: "🐉", t: "fantasy novels", ing: false },
+    { e: "📈", t: "TikTok trends", ing: false },
+    { e: "💃", t: "dancing", ing: true },
+    { e: "✏️", t: "drawing", ing: true },
+    { e: "🍳", t: "cooking", ing: true },
+    { e: "🎨", t: "painting", ing: true },
+    { e: "🤳", t: "taking selfies", ing: true },
+    { e: "🎬", t: "making videos", ing: true },
+    { e: "🏂", t: "snowboarding", ing: true },
+    { e: "🎮", t: "playing video games", ing: true },
+    { e: "👗", t: "finding cool outfits", ing: true },
+    { e: "🛍️", t: "shopping", ing: true },
+    { e: "🎤", t: "singing", ing: true }
+  ];
+
+  var TWISTS = [
+    { id: "true",     emoji: "😇", text: "Is this really you? Tell me the truth!",       kinds: ["love", "skill", "curious", "dislike"] },
+    { id: "lie",      emoji: "🕵️", text: "I’ll guess: is it true or a lie?",             kinds: ["love", "skill", "curious", "dislike"] },
+    { id: "friend",   emoji: "👯", text: "What about your best friend? Is it the same for her?", kinds: ["love", "skill", "curious", "dislike"] },
+    { id: "convince", emoji: "🤨", text: "Hmm… why should I try it?",                    kinds: ["love", "curious"] }
+  ];
+
+  var LEVELS = [
+    { min: 0,  name: "New creator" },
+    { min: 5,  name: "Rising star" },
+    { min: 10, name: "Trending" },
+    { min: 16, name: "Verified ✓" }
+  ];
+
+  var QUIZ = [
+    { stem: "I’m mad ___ coffee.", opts: ["on", "about", "at"], ans: "about", why: "We say mad about." },
+    { stem: "She’s a big fan ___ fantasy novels.", opts: ["of", "on", "in"], ans: "of", why: "We say a big fan of." },
+    { stem: "I’m good ___ telling stories.", opts: ["in", "at", "about"], ans: "at", why: "We say good at." },
+    { stem: "He’s keen ___ football.", opts: ["on", "of", "at"], ans: "on", why: "We say keen on." },
+    { stem: "We’re interested ___ trying new things.", opts: ["on", "about", "in"], ans: "in", why: "We say interested in." },
+    { stem: "I’m not very keen ___ horror films.", opts: ["at", "on", "about"], ans: "on", why: "We say keen on." },
+    { stem: "My sister is mad ___ perfume.", opts: ["about", "of", "in"], ans: "about", why: "We say mad about." },
+    { stem: "Are you a big fan ___ K-pop?", opts: ["about", "at", "of"], ans: "of", why: "We say a big fan of." },
+    { stem: "I’m quite good ___ drawing.", opts: ["at", "on", "of"], ans: "at", why: "We say good at." },
+    { stem: "They’re really interested ___ fashion.", opts: ["of", "in", "at"], ans: "in", why: "We say interested in." },
+    { stem: "I’m really ___ matcha lattes right now.", opts: ["into", "of", "for"], ans: "into", why: "We say into: I’m really into it." },
+    { stem: "I’m not ___ comics.", opts: ["to", "into", "by"], ans: "into", why: "We say not into." },
+    { stem: "I’m good at ___ videos.", opts: ["make", "making", "to make"], ans: "making", why: "After a preposition we use -ing." },
+    { stem: "She’s interested in ___ new coffee shops.", opts: ["try", "to try", "trying"], ans: "trying", why: "After a preposition we use -ing." },
+    { stem: "I’m not keen on ___ up early.", opts: ["getting", "get", "to get"], ans: "getting", why: "After a preposition we use -ing." },
+    { stem: "He’s a big fan of ___ sneakers.", opts: ["collect", "collecting", "to collect"], ans: "collecting", why: "After a preposition we use -ing." }
+  ];
+
+  var PERSONAS = [
+    { e: "☕", name: "Mia", age: 14, job: "coffee blogger", traits: [
+      ["love", "iced latte"], ["love", "matcha"], ["skill", "making latte art"], ["curious", "trying new cafés"], ["dislike", "getting up early"] ] },
+    { e: "🌸", name: "Kira", age: 15, job: "perfume reviewer", traits: [
+      ["love", "vanilla perfume"], ["love", "small bottles"], ["skill", "guessing smells"], ["curious", "learning about scents"], ["dislike", "very strong smells"] ] },
+    { e: "🛹", name: "Zoe", age: 13, job: "skater girl", traits: [
+      ["love", "skateboarding"], ["love", "snowboarding"], ["skill", "doing tricks"], ["curious", "street art"], ["dislike", "rainy days"] ] },
+    { e: "🎤", name: "Lana", age: 16, job: "K-pop dancer", traits: [
+      ["love", "K-pop"], ["love", "live concerts"], ["skill", "dancing"], ["curious", "learning Korean"], ["dislike", "horror films"] ] },
+    { e: "👗", name: "Eva", age: 14, job: "thrift and outfit queen", traits: [
+      ["love", "thrifting"], ["love", "big sneakers"], ["skill", "finding cool outfits"], ["curious", "vintage jackets"], ["dislike", "shopping at big malls"] ] },
+    { e: "🎮", name: "Nika", age: 13, job: "gamer", traits: [
+      ["love", "playing video games"], ["love", "fantasy games"], ["skill", "solving puzzles"], ["curious", "making her own game"], ["dislike", "football"] ] },
+    { e: "📚", name: "Sofia", age: 15, job: "bookworm", traits: [
+      ["love", "fantasy novels"], ["love", "comics"], ["skill", "telling stories"], ["curious", "starting a podcast"], ["dislike", "scary movies"] ] },
+    { e: "🧁", name: "Lily", age: 14, job: "baker", traits: [
+      ["love", "cupcakes"], ["love", "baking videos"], ["skill", "decorating cakes"], ["curious", "trying new recipes"], ["dislike", "washing dishes"] ] }
+  ];
+
+  /* ---------- state ---------- */
+  var hearts = 0;
+  var deck = [];
+  var card = null;
+  var timerId = null;
+  var quiz = null;
+  var toastId = null;
+  var pdeck = [];
+  var persona = null;
+
+  /* ---------- shared ---------- */
+  function levelFor(n) {
+    var l = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) { if (n >= LEVELS[i].min) l = LEVELS[i]; }
+    return l;
+  }
+  function showToast(msg) {
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastId);
+    toastId = setTimeout(function () { t.classList.remove("show"); }, 2400);
+  }
+  function addHearts(n) {
+    var before = levelFor(hearts).name;
+    hearts = Math.max(0, hearts + n);
+    var h = $("#hearts");
+    h.textContent = "❤️ " + hearts;
+    h.classList.remove("bump");
+    void h.offsetWidth;
+    h.classList.add("bump");
+    var after = levelFor(hearts).name;
+    $("#level").textContent = after;
+    if (n > 0 && after !== before) showToast("New level: " + after);
+  }
+  function staticChips() {
+    return '<section class="bank" aria-label="Phrases"><p>Phrases · then a noun or an -ing word</p><div class="chips">' +
+      PHRASES.map(function (p) { return '<span class="chip">' + p + '</span>'; }).join("") + '</div></section>';
+  }
+  function setView(v) {
+    stopTimer();
+    $("#tabCheck").setAttribute("aria-pressed", v === "check");
+    $("#tabSay").setAttribute("aria-pressed", v === "say");
+    $("#tabPersona").setAttribute("aria-pressed", v === "persona");
+    if (v === "check") { startQuiz(); }
+    else if (v === "persona") { renderPersona(); }
+    else { renderSay(); }
+  }
+
+  /* ---------- Say it ---------- */
+  function draw() {
+    stopTimer();
+    if (deck.length === 0) deck = shuffle(TOPICS);
+    var topic = deck.pop();
+    var kinds = ["love", "curious", "dislike"];
+    if (topic.ing) kinds.push("skill", "skill");
+    var kind = pick(kinds);
+    var twist = pick(TWISTS.filter(function (t) { return t.kinds.indexOf(kind) !== -1; }));
+    card = { topic: topic, kind: kind, twist: twist, because: false, fb: "" };
+    renderSay();
+  }
+
+  function renderSay() {
+    var el = $("#view");
+    if (!card) {
+      el.innerHTML =
+        '<section class="card">' +
+        '<div class="card-top"><span class="rec"><i></i>ready to record</span></div>' +
+        '<p class="phrase" style="margin-top:18px">You’re making a review video.</p>' +
+        '<p class="task">Draw a card. You get a topic and a feeling. Choose a phrase and say one sentence.</p>' +
+        '<div class="actions"><button class="btn primary full" id="draw">Draw a card</button></div>' +
+        '</section>' + staticChips();
+      $("#draw").onclick = draw;
+      return;
+    }
+    var c = card, k = KINDS[c.kind];
+    var chips = PHRASES.map(function (p) { return '<button class="chip" data-p="' + p + '">' + p + '</button>'; }).join("");
+    el.innerHTML =
+      '<section class="card">' +
+        '<div class="card-top"><span class="rec"><i></i>recording</span>' +
+        '<button class="btn small" id="timerBtn">Timer 20 s</button></div>' +
+        '<div class="topic"><span class="emoji" aria-hidden="true">' + c.topic.e + '</span>' +
+        '<div><span class="topic-label">Topic</span><span class="topic-name">' + c.topic.t + '</span></div></div>' +
+        '<p class="phrase"><span aria-hidden="true">' + k.emoji + '</span> ' + k.label + '</p>' +
+        '<div class="bar" aria-hidden="true"><div id="fill"></div></div>' +
+        '<div class="comment"><span class="avatar" aria-hidden="true">' + c.twist.emoji + '</span>' +
+        '<div class="bubble"><span class="who">@your_viewer</span><p>' + c.twist.text + '</p></div></div>' +
+        '<p class="task">Say one sentence. Use a phrase from the list below.</p>' +
+      '</section>' +
+      '<section class="bank" aria-label="Which phrase did she use?">' +
+        '<p>Teacher: tap the phrase she used</p>' +
+        '<div class="chips">' + chips + '</div>' +
+        '<button class="btn small because" id="because" aria-pressed="' + c.because + '">She added “because” +1</button>' +
+        '<p class="feedback" id="fb" aria-live="polite">' + c.fb + '</p>' +
+      '</section>' +
+      '<div class="actions"><button class="btn skip" id="skip">Skip this card</button></div>';
+    Array.prototype.forEach.call(document.querySelectorAll(".chips .chip"), function (b) {
+      b.onclick = function () { choosePhrase(b.getAttribute("data-p")); };
+    });
+    $("#because").onclick = function () { card.because = !card.because; renderSay(); };
+    $("#skip").onclick = draw;
+    $("#timerBtn").onclick = startTimer;
+  }
+
+  function choosePhrase(p) {
+    var k = KINDS[card.kind];
+    if (k.ok.indexOf(p) === -1) {
+      card.fb = "Hmm, “" + p + "” doesn’t fit here. " + k.hint;
+      renderSay();
+      return;
+    }
+    addHearts(1 + (card.because ? 1 : 0));
+    draw();
+  }
+
+  function stopTimer() { clearInterval(timerId); timerId = null; }
+  function startTimer() {
+    stopTimer();
+    var total = 20, left = total;
+    var fill = $("#fill"), btn = $("#timerBtn");
+    if (!fill || !btn) return;
+    fill.style.width = "100%";
+    btn.textContent = left + " s";
+    timerId = setInterval(function () {
+      left--;
+      var f = $("#fill"), b = $("#timerBtn");
+      if (!f || !b) { stopTimer(); return; }
+      f.style.width = Math.max(0, (left / total) * 100) + "%";
+      b.textContent = left > 0 ? left + " s" : "Time’s up!";
+      if (left <= 0) stopTimer();
+    }, 1000);
+  }
+
+  /* ---------- Check it ---------- */
+  function startQuiz() {
+    quiz = { qs: shuffle(QUIZ), i: 0, right: 0 };
+    renderQuiz();
+  }
+  function renderQuiz() {
+    var el = $("#view");
+    if (quiz.i >= quiz.qs.length) {
+      var n = quiz.right, total = quiz.qs.length;
+      var msg = n >= total - 2 ? "Wow. Your phrases are ready for a real video."
+              : n >= total / 2 ? "Good! Try again and aim for the top."
+              : "No worries. Play again, and look at the phrases below.";
+      el.innerHTML =
+        '<section class="card"><p class="progress">Finished</p>' +
+        '<p class="end-score">' + n + ' of ' + total + '</p><p>' + msg + '</p>' +
+        '<div class="actions"><button class="btn" id="again">Play again</button>' +
+        '<button class="btn primary" id="toSay">Go to Say it</button></div></section>' + staticChips();
+      $("#again").onclick = startQuiz;
+      $("#toSay").onclick = function () { setView("say"); };
+      return;
+    }
+    var q = quiz.qs[quiz.i];
+    var parts = q.stem.split("___");
+    var opts = shuffle(q.opts).map(function (o) { return '<button class="btn opt" data-o="' + o + '">' + o + '</button>'; }).join("");
+    el.innerHTML =
+      '<section class="card"><p class="progress">' + (quiz.i + 1) + ' of ' + quiz.qs.length + '</p>' +
+      '<p class="stem">' + parts[0] + '<span class="gap" id="gap">&nbsp;</span>' + parts[1] + '</p>' +
+      '<div class="opts" id="opts">' + opts + '</div>' +
+      '<p class="feedback" id="fb" aria-live="polite"></p>' +
+      '<div class="actions"><button class="btn primary full" id="next" style="display:none">Next</button></div>' +
+      '</section>' + staticChips();
+    var buttons = document.querySelectorAll(".opt");
+    Array.prototype.forEach.call(buttons, function (b) {
+      b.onclick = function () { answer(q, b, buttons); };
+    });
+  }
+  function answer(q, chosen, buttons) {
+    var ok = chosen.getAttribute("data-o") === q.ans;
+    Array.prototype.forEach.call(buttons, function (b) {
+      b.disabled = true;
+      if (b.getAttribute("data-o") === q.ans) { b.classList.add("right"); b.textContent = "✓ " + b.getAttribute("data-o"); }
+    });
+    if (!ok) { chosen.classList.add("wrong"); chosen.textContent = "✕ " + chosen.getAttribute("data-o"); }
+    var gap = $("#gap");
+    gap.textContent = q.ans;
+    gap.classList.add("filled");
+    if (ok) quiz.right++;
+    $("#fb").textContent = (ok ? "Yes! " : "Not quite. ") + q.why;
+    var nx = $("#next");
+    nx.style.display = "block";
+    nx.textContent = quiz.i + 1 >= quiz.qs.length ? "See my score" : "Next";
+    nx.onclick = function () { quiz.i++; renderQuiz(); };
+    nx.focus();
+  }
+
+  /* ---------- Be someone ---------- */
+  function drawPersona() {
+    if (pdeck.length === 0) pdeck = shuffle(PERSONAS);
+    var p = pdeck.pop();
+    persona = {
+      p: p,
+      traits: p.traits.map(function (t) { return { k: t[0], t: t[1], phrase: null }; }),
+      open: -1,
+      q: 0,
+      bonus: false,
+      fb: ""
+    };
+    persona.q = Math.floor(Math.random() * persona.traits.length);
+    renderPersona();
+  }
+
+  function usedPhrases() {
+    return persona.traits.filter(function (t) { return t.phrase; }).map(function (t) { return t.phrase; });
+  }
+
+  function renderPersona() {
+    var el = $("#view");
+    if (!persona) {
+      el.innerHTML =
+        '<section class="card">' +
+        '<div class="card-top"><span class="rec"><i></i>ready to record</span></div>' +
+        '<p class="phrase" style="margin-top:18px">Be someone else for one video.</p>' +
+        '<p class="task">You get a character. She loves some things, is good at something, wants to learn something, and doesn’t like something. Introduce yourself as her.</p>' +
+        '<div class="actions"><button class="btn primary full" id="pick">Pick a character</button></div>' +
+        '</section>' + staticChips();
+      $("#pick").onclick = drawPersona;
+      return;
+    }
+    var p = persona.p;
+    var used = usedPhrases();
+    var allDone = persona.traits.every(function (t) { return t.phrase; });
+    var rows = persona.traits.map(function (t, i) {
+      var k = KINDS[t.k];
+      var done = !!t.phrase;
+      var sub = done ? '✓ ' + t.phrase : k.short;
+      var row = '<li><button class="trait' + (done ? ' done' : '') + '" data-i="' + i + '" aria-expanded="' + (persona.open === i) + '">' +
+        '<span class="trait-icon" aria-hidden="true">' + k.emoji + '</span>' +
+        '<span><span class="trait-line">' + t.t + '</span><span class="trait-sub">' + sub + '</span></span></button>';
+      if (persona.open === i && !done) {
+        var chips = PHRASES.map(function (ph) {
+          var dis = used.indexOf(ph) !== -1;
+          return '<button class="chip" data-p="' + ph + '"' + (dis ? ' disabled' : '') + '>' + ph + '</button>';
+        }).join("");
+        row += '<div class="pick-panel"><p>Teacher: which phrase did she use? (A new phrase each time.)</p>' +
+          '<div class="chips">' + chips + '</div>' +
+          '<p class="feedback" aria-live="polite" style="margin:10px 0 0;min-height:0">' + persona.fb + '</p></div>';
+      }
+      return row + '</li>';
+    }).join("");
+    var q = persona.traits[persona.q];
+    el.innerHTML =
+      '<section class="card">' +
+        '<div class="card-top"><span class="rec"><i></i>recording</span></div>' +
+        '<div class="persona-head"><span class="emoji" aria-hidden="true">' + p.e + '</span>' +
+        '<div><span class="persona-name">' + p.name + ', ' + p.age + '</span><span class="persona-job">' + p.job + '</span></div></div>' +
+        '<p class="task">Now you are ' + p.name + '. Say one sentence for each line. Choose a different phrase every time.</p>' +
+        '<ul class="traits">' + rows + '</ul>' +
+        '<div class="comment"><span class="avatar" aria-hidden="true">🤔</span>' +
+        '<div class="bubble"><span class="who">@your_viewer</span><p>Tell me more about “' + q.t + '”! Why?</p></div></div>' +
+        '<button class="btn small" id="another" style="margin-top:10px">Another question</button>' +
+      '</section>' +
+      '<div class="actions">' +
+        '<button class="btn mint" id="bonus"' + (allDone && !persona.bonus ? '' : ' disabled') + '>' + (persona.bonus ? 'Bonus ✓' : 'No stops +2') + '</button>' +
+        '<button class="btn primary" id="newp">New character</button>' +
+      '</div>' + staticChips();
+
+    Array.prototype.forEach.call(document.querySelectorAll(".trait"), function (b) {
+      b.onclick = function () {
+        var i = +b.getAttribute("data-i");
+        var t = persona.traits[i];
+        if (t.phrase) {
+          t.phrase = null;
+          addHearts(-1);
+          persona.open = -1;
+        } else {
+          persona.open = persona.open === i ? -1 : i;
+        }
+        persona.fb = "";
+        renderPersona();
+        var again = document.querySelector('.trait[data-i="' + i + '"]');
+        if (again) again.focus();
+      };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".pick-panel .chip"), function (b) {
+      b.onclick = function () {
+        var ph = b.getAttribute("data-p");
+        var t = persona.traits[persona.open];
+        var k = KINDS[t.k];
+        if (k.ok.indexOf(ph) === -1) {
+          persona.fb = "Hmm, “" + ph + "” doesn’t fit here. " + k.hint;
+          renderPersona();
+          return;
+        }
+        t.phrase = ph;
+        persona.open = -1;
+        persona.fb = "";
+        addHearts(1);
+        renderPersona();
+      };
+    });
+    $("#another").onclick = function () {
+      var n = persona.traits.length, next = persona.q;
+      while (n > 1 && next === persona.q) next = Math.floor(Math.random() * n);
+      persona.q = next;
+      renderPersona();
+    };
+    $("#bonus").onclick = function () {
+      if (!persona.bonus) { persona.bonus = true; addHearts(2); renderPersona(); }
+    };
+    $("#newp").onclick = drawPersona;
+  }
+
+  /* ---------- start ---------- */
+  $("#tabCheck").onclick = function () { setView("check"); };
+  $("#tabSay").onclick = function () { setView("say"); };
+  $("#tabPersona").onclick = function () { setView("persona"); };
+  renderPersona();
+})();
+</script>
+</body>
+</html>
